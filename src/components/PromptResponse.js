@@ -6,6 +6,7 @@ const PromptResponse = () => {
   const [response, setResponse] = useState('');
   const [isCopied, setIsCopied] = useState(false);
   const [model, setModel] = useState('gemini-1.5-flash-001'); 
+
   const handleCopy = () => {
     navigator.clipboard.writeText(text)
       .then(() => setIsCopied(true))
@@ -31,7 +32,7 @@ const PromptResponse = () => {
       }
 
       const data = await response.json();
-      setResponse(data.data);
+      setResponse(data.data); 
     } catch (error) {
       console.error('Error fetching response:', error);
       setResponse(`Error: ${error.message}`);
