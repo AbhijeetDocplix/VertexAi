@@ -17,7 +17,8 @@
   font-family: 'Roboto', sans-serif;
 }
 
-.text-section, .response-section {
+.text-section,
+.response-section {
   margin-bottom: 20px;
 }
 
@@ -126,8 +127,15 @@ button:last-of-type:hover {
   animation: spin 1s linear infinite;
 }
 
+.logo {
+  max-width: 260px;
+  height: auto;
+}
+
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 

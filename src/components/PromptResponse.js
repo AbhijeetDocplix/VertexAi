@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { marked } from 'marked';
+import removeMarkdown from 'remove-markdown';
 import './PromptResponse.css';
+import logo from './logo.png';
 
 const PromptResponse = () => {
   const [text, setText] = useState('');
@@ -8,8 +11,17 @@ const PromptResponse = () => {
   const [model, setModel] = useState('medlm-medium');
   const [loading, setLoading] = useState(false);
 
+
+  const formatResponseForCopy = (text) => {
+
+    const formattedText = text.replace(/\*\*(.*?)\*\*/g, (match, p1) => `<b>${p1}</b>`);
+    return removeMarkdown(formattedText);
+  };
+
+
   const handleCopy = () => {
-    navigator.clipboard.writeText(response)
+    const formattedResponse = formatResponseForCopy(response);
+    navigator.clipboard.writeText(formattedResponse)
       .then(() => setIsCopied(true))
       .catch(() => setIsCopied(false));
 
@@ -25,22 +37,23 @@ const PromptResponse = () => {
   const handleSubmit = async () => {
     setLoading(true);
     setResponse('');
-  
+
     try {
       const response = await fetch('https://stag-ai.docplix.online/generate-text-response', {
+        // text: `give this response in HTML`,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ text, model }),
       });
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
+
       const data = await response.json();
-      setResponse(data.data); 
+      setResponse(data.data);
     } catch (error) {
       if (error.name === 'AbortError') {
         console.error('Fetch request timed out');
@@ -56,7 +69,9 @@ const PromptResponse = () => {
 
   return (
     <div className="container">
-      <div className="title">DocPlix AI</div>
+      <div className="title">
+        <img src={logo} alt="Company Logo" className="logo" />
+      </div>
       <div className="text-section">
         <h3>Text</h3>
         <textarea
@@ -69,6 +84,7 @@ const PromptResponse = () => {
           <label>Select Model:</label>
           <select value={model} onChange={(e) => setModel(e.target.value)}>
             <option value="medlm-medium">MedLM</option>
+            <option value="medlm-large">MedLM Large</option>
             <option value="gemini-1.5-pro-001">Gemini Pro</option>
           </select>
         </div>
@@ -86,9 +102,10 @@ const PromptResponse = () => {
       </div>
       <div className="response-section">
         <h3>Response</h3>
-        <pre className="response">
-          {response}
-        </pre>
+        <div
+          className="response"
+          dangerouslySetInnerHTML={{ __html: marked(response) }}
+        />
       </div>
     </div>
   );
